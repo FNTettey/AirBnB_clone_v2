@@ -1,4 +1,4 @@
-# (288) 0x03. AirBnB clone - Deploy static
+# (289) 0x04. AirBnB clone - Web framework
 Foundations > Higher-level programming > AirBnB clone
 
 ---
@@ -7,24 +7,17 @@ Foundations > Higher-level programming > AirBnB clone
 Guillaume Salva
 
 ### Assignment dates
-08-17-2020 to 08-18-2020
+08-31-2020 to 09-03-2020
 
 ### Description
-Second of three projects building the second iteration of a website cloning the basic features of the [`airbnb.com` main page, circa 2014-2017](https://web.archive.org/web/20170206112507/https://www.airbnb.com/).
+Third of three projects building the second iteration of a website cloning the basic features of the [`airbnb.com` main page, circa 2014-2017](https://web.archive.org/web/20170206112507/https://www.airbnb.com/).
 
-Revisiting Continuous Integration/Continuous Deployment and Nginx concepts from [`holberton-system_engineering-devops`](https://github.com/allelomorph/holberton-system_engineering-devops), plus an intrduction to the Python library Fabric. Deploying the static web content from [(268) 0x01. AirBnB clone - Web static](https://github.com/allelomorph/AirBnB_clone/blob/master/PROJECT_0x01.md) to a simple architecture of two web servers and one load balancer.
+Using the Python library Flask along with Jinja templates to create a web framework and application to dynamically display the contents of our storage engines.
+
+### Provided File(s)
+* [`7-states_list.sql`](./web_static/tests/7-states_list.sql) [`10-hbnb_filters.sql`](./web_static/tests/10-hbnb_filters.sql) [`100-hbnb.sql`](./web_static/tests/100-hbnb.sql)
 
 ## General requirements
-
-## General requirements
-
-### bash
-* Interpreter conditions:
-  * Ubuntu 14.04 LTS
-* First line of executable scripts will be `#!/bin/bash`
-* Second line is a comment describing the script's purpose
-* Compliance with linter:
-  * Shellcheck version 0.3.3-1~ubuntu14.04.1 (via `apt-get`)
 
 ### Python
 * Interpreter conditions:
@@ -45,109 +38,268 @@ Revisiting Continuous Integration/Continuous Deployment and Nginx concepts from 
   * located in a `tests/` folder, with a file structure mimicing that of your project, but with a `test_` prefix added to all file/directory names
   * tests should be capable of being run with `python3 -m unittest discover tests`, or individually per file with `python3 -m unittest <test file>`
 
-### Fabric Installation
+### HTML / CSS
+* Your code should be W3C compliant and validate with [W3C-Validator](https://github.com/holbertonschool/W3C-Validator)
+* All your CSS files should be in `styles` folder
+* All your images should be in `images` folder
+* You are not allowed to use `!important` and `id` (`#...` in the CSS file)
+* You are not allowed to use tags `img`, `embed` and `iframe`
+* You are not allowed to use Javascript
+* Example screenshots taken on Chrome 56
+* No cross browsers
+* You have to follow all requirements but some `margin`/`padding` are missing - you should try to fit as much as you can to screenshots
+
+### Installing Flask
 ```bash
-$ pip3 uninstall Fabric
-$ sudo apt-get install libffi-dev
-$ sudo apt-get install libssl-dev
-$ sudo apt-get install build-essential
-$ sudo apt-get install python3.4-dev
-$ sudo apt-get install libpython3-dev
-$ pip3 install pyparsing
-$ pip3 install appdirs
-$ pip3 install setuptools==40.1.0
-$ pip3 install cryptography==2.8
-$ pip3 install bcrypt==3.1.7
-$ pip3 install PyNaCl==1.3.0
-$ pip3 install Fabric3==1.14.post1
+$ pip3 install Flask
 ```
 
 ---
 
 ## Mandatory Tasks
 
-### :white_check_mark: 0. Prepare your web servers
-Write a Bash script that sets up your web servers for the deployment of `web_static`. It must:
-* Install Nginx if it not already installed
-* Create the folder `/data/` if it doesn’t already exist
-* Create the folder `/data/web_static/` if it doesn’t already exist
-* Create the folder `/data/web_static/releases/` if it doesn’t already exist
-* Create the folder `/data/web_static/shared/` if it doesn’t already exist
-* Create the folder `/data/web_static/releases/test/` if it doesn’t already exist
-* Create a fake HTML file `/data/web_static/releases/test/index.html` (with simple content, to test your Nginx configuration)
-* Create a symbolic link `/data/web_static/current` linked to the `/data/web_static/releases/test/` folder. If the symbolic link already exists, it should be deleted and recreated every time the script is ran.
-* Give ownership of the `/data/` folder to the `ubuntu` user AND group (you can assume this user and group exist). This should be recursive; everything inside should be created/owned by this user/group.
-* Update the Nginx configuration to serve the content of `/data/web_static/current/` to `hbnb_static` (ex: https://mydomainname.tech/hbnb_static). Don’t forget to restart Nginx after updating the configuration:
-  * Use `alias` inside your Nginx configuration
-  * [Tip](https://stackoverflow.com/questions/10631933/nginx-static-file-serving-confusion-with-root-alias)
+### :white_check_mark: 0. Hello Flask!
+Write a script that starts a Flask web application:
+* Your web application must be listening on `0.0.0.0`, port `5000`
+* Routes:
+    * `/`: display “Hello HBNB!”
+* You must use the option `strict_slashes=False` in your route definition
 
-Your program should always exit successfully. **Don’t forget to run your script on both of your web servers.**
+File(s): [`web_flask/0-hello_route.py`](./web_flask/0-hello_route.py) [`web_flask/__init__.py`](./web_flask/__init__.py)
 
-File(s): [`0-setup_web_static.sh`](./0-setup_web_static.sh)
+### :white_check_mark: 1. HBNB
+Write a script that starts a Flask web application:
+* Your web application must be listening on `0.0.0.0`, port `5000`
+* Routes:
+    * `/`: display `Hello HBNB!`
+    * `/hbnb`: display `HBNB`
+* You must use the option `strict_slashes=False` in your route definition
 
-### :white_check_mark: 1. Compress before sending
-Write a Fabric script that generates a [.tgz](https://en.wikipedia.org/wiki/Tar_%28computing%29) archive from the contents of the `web_static` folder of your AirBnB Clone repo, using the function `do_pack`.
-* Prototype: `def do_pack():`
-* All files in the folder `web_static` must be added to the final archive
-* All archives must be stored in the folder `versions` (your function should create this folder if it doesn’t exist)
-* The name of the archive created must be `web_static_<year><month><day><hour><minute><second>.tgz`
-* The function do_pack must return the archive path if the archive has been correctly generated. Otherwise, it should return `None`
+File(s): [`web_flask/1-hbnb_route.py`](./web_flask/1-hbnb_route.py)
 
-File(s): [`1-pack_web_static.py`](./1-pack_web_static.py)
+### :white_check_mark: 2. C is fun!
+Write a script that starts a Flask web application:
+* Your web application must be listening on `0.0.0.0`, port `5000`
+* Routes:
+    * `/`: display `Hello HBNB!`
+    * `/hbnb`: display `HBNB`
+    * `/c/<text>`: display `C ` followed by the value of the text variable (replace underscore `_` symbols with a space )
+* You must use the option `strict_slashes=False` in your route definition
 
-### :white_large_square: 2. Deploy archive!
-Write a Fabric script (based on the file `1-pack_web_static.py`) that distributes an archive to your web servers, using the function `do_deploy`:
-* Prototype: `def do_deploy(archive_path):`
-* Returns `False` if the file at the path `archive_path` doesn’t exist
-* The script should take the following steps:
-    * Upload the archive to the `/tmp/` directory of the web server
-    * Uncompress the archive to the folder `/data/web_static/releases/<archive filename without extension>` on the web server
-    * Delete the archive from the web server
-    * Delete the symbolic link `/data/web_static/current` from the web server
-    * Create a new the symbolic link `/data/web_static/current` on the web server, linked to the new version of your code (`/data/web_static/releases/<archive filename without extension>`)
-* All remote commands must be executed on your both web servers (using `env.hosts = ['<IP web-01>', 'IP web-02']` variable in your script)
-* Returns `True` if all operations have been done correctly, otherwise returns `False`
-* You must use this script to deploy it on your servers: `xx-web-01` and `xx-web-02`
+File(s): [`web_flask/2-c_route.py`](./web_flask/2-c_route.py)
 
-In the following example, the SSH key and the username used for accessing to the server are passed in the command line. Of course, you could define them as Fabric environment variables (ex: `env.user =...`)
+### :white_check_mark: 3. Python is cool!
+Write a script that starts a Flask web application:
+* Your web application must be listening on `0.0.0.0`, port `5000`
+* Routes:
+    * `/`: display `Hello HBNB!`
+    * `/hbnb`: display `HBNB`
+    * `/c/<text>`: display `C `, followed by the value of the text variable (replace underscore `_` symbols with a space )
+    * `/python/(<text>)`: display `Python `, followed by the value of the text variable (replace underscore `_` symbols with a space )
+        * The default value of text is `is cool`
+* You must use the option `strict_slashes=False` in your route definition
 
-File(s): [`2-do_deploy_web_static.py`](./2-do_deploy_web_static.py)
+File(s): [`web_flask/3-python_route.py`](./web_flask/3-python_route.py)
 
-### :white_check_mark: 3. Full deployment
-Write a Fabric script (based on the file `2-do_deploy_web_static.py`) that creates and distributes an archive to your web servers, using the function `deploy`:
-* Prototype: `def deploy():`
-* The script should take the following steps:
-    * Call the `do_pack()` function and store the path of the created archive
-    * Return `False` if no archive has been created
-    * Call the `do_deploy(archive_path)` function, using the new path of the new archive
-    * Return the return value of `do_deploy`
-* All remote commands must be executed on both of web your servers (using env.hosts = ['<IP web-01>', 'IP web-02'] variable in your script)
-* You must use this script to deploy it on your servers: `xx-web-01` and `xx-web-02`
+### :white_check_mark: 4. Is it a number?
+Write a script that starts a Flask web application:
+* Your web application must be listening on `0.0.0.0`, port `5000`
+* Routes:
+    * `/`: display `Hello HBNB!`
+    * `/hbnb`: display `HBNB`
+    * `/c/<text>`: display `C `, followed by the value of the text variable (replace underscore `_` symbols with a space )
+    * `/python/(<text>)`: display `Python `, followed by the value of the text variable (replace underscore `_` symbols with a space )
+        * The default value of text is `is cool`
+    * `/number/<n>`: display `n is a number` only if `n` is an integer
+* You must use the option `strict_slashes=False` in your route definition
 
-File(s): [`3-deploy_web_static.py`](./3-deploy_web_static.py)
+File(s): [`web_flask/4-number_route.py`](./web_flask/4-number_route.py)
+
+### :white_check_mark: 5. Number template
+Write a script that starts a Flask web application:
+* Your web application must be listening on `0.0.0.0`, port `5000`
+* Routes:
+    * `/`: display “Hello HBNB!`
+    * `/hbnb`: display `HBNB`
+    * `/c/<text>`: display `C `, followed by the value of the text variable (replace underscore `_` symbols with a space )
+    * `/python/(<text>)`: display `Python `, followed by the value of the text variable (replace underscore `_` symbols with a space )
+        * The default value of text is `is cool`
+    * `/number/<n>`: display `n is a number` only if `n` is an integer
+    * `/number_template/<n>`: display a HTML page only if `n` is an integer:
+        * `H1` tag: `Number: n` inside the tag BODY
+* You must use the option `strict_slashes=False` in your route definition
+
+File(s): [`web_flask/5-number_template.py`](./web_flask/5-number_template.py)  [`web_flask/templates/5-number.html`](./web_flask/templates/5-number.html)
+
+### :white_check_mark: 6. Odd or even?
+Write a script that starts a Flask web application:
+* Your web application must be listening on `0.0.0.0`, port `5000`
+* Routes:
+    * `/`: display `Hello HBNB!`
+    * `/hbnb`: display `HBNB`
+    * `/c/<text>`: display `C `, followed by the value of the text variable (replace underscore `_` symbols with a space )
+    * `/python/(<text>)`: display `Python `, followed by the value of the text variable (replace underscore `_` symbols with `a space )
+        * The default value of text is `is cool`
+    * `/number/<n>`: display `n is a number` only if `n` is an integer
+    * `/number_template/<n>`: display a HTML page only if `n` is an integer:
+        * `H1` tag: `Number: n` inside the tag `BODY`
+    * `/number_odd_or_even/<n>: display a HTML page only if n is an integer:
+        * `H1` tag: `Number: n is even|odd` inside the tag `BODY`
+* You must use the option `strict_slashes=False` in your route definition
+
+File(s): [`web_flask/6-number_odd_or_even.py`](./web_flask/6-number_odd_or_even.py) [`web_flask/templates/6-number_odd_or_even.html`](./web_flask/templates/6-number_odd_or_even.html)
+
+### :white_check_mark: 7. Improve engines
+Before using Flask to display our HBNB data, you will need to update some part of our engine:
+
+Update `FileStorage`: (`models/engine/file_storage.py`)
+* Add a public method `def close(self):`: call `reload()` method for deserializing the JSON file to objects
+
+Update `DBStorage`: (`models/engine/db_storage.py`)
+* Add a public method `def close(self):`: call `remove()` method on the private session attribute (`self.__session`) [tips](https://docs.sqlalchemy.org/en/13/orm/contextual.html) or `close()` on the class `Session` [tips](https://docs.sqlalchemy.org/en/13/orm/session_api.html)
+
+Update `State`: (`models/state.py`) - If it’s not already present
+* If your storage engine is not `DBStorage`, add a public getter method `cities` to return the list of `City` objects from storage linked to the current `State`
+
+File(s): [`models/engine/file_storage.py`](./models/engine/file_storage.py) [`models/engine/db_storage.py`](./models/engine/db_storage.py) [`models/state.py`](./models/state.py)
+
+### :white_check_mark: 8. List of states
+Write a script that starts a Flask web application:
+* Your web application must be listening on `0.0.0.0`, port `5000`
+* You must use `storage` for fetching data from the storage engine (`FileStorage` or `DBStorage`) => `from models import storage and storage.all(...)`
+* After each request you must remove the current SQLAlchemy Session:
+    * Declare a method to handle `@app.teardown_appcontext`
+    * Call in this method `storage.close()`
+* Routes:
+    * `/states_list`: display a HTML page: (inside the tag `BODY`)
+        * `H1` tag: `States`
+        * `UL` tag: with the list of all `State` objects present in `DBStorage` sorted by name (A->Z) 
+            * `LI` tag: description of one `State`: `<state.id>: <B><state.name></B>`
+* Import this [`7-states_list.sql`](`./web_flask/tests/7-states_list.sql`) to have some data
+* You must use the option `strict_slashes=False` in your route definition
+
+**IMPORTANT**
+* Make sure you have a running and valid `setup_mysql_dev.sql` in your `AirBnB_clone_v2` repository ([task](./PROJECT_0x02.md/#white-check-mark-3-mysql-setup-development))
+* Make sure all tables are created when you run `echo "quit" | HBNB_MYSQL_USER=hbnb_dev HBNB_MYSQL_PWD=hbnb_dev_pwd HBNB_MYSQL_HOST=localhost HBNB_MYSQL_DB=hbnb_dev_db HBNB_TYPE_STORAGE=db ./console.py`
+
+File(s): [`web_flask/7-states_list.py`](./web_flask/7-states_list.py)  [`web_flask/templates/7-states_list.html`](./web_flask/templates/7-states_list.html)
+
+### :white_check_mark: 9. Cities by states
+Write a script that starts a Flask web application:
+* Your web application must be listening on `0.0.0.0`, port `5000`
+* You must use `storage` for fetching data from the storage engine (`FileStorage` or `DBStorage`) => `from models import storage` and `storage.all(...)`
+* To load all cities of a `State`:
+    * If your storage engine is `DBStorage`, you must use `cities` relationship
+    * Otherwise, use the public getter method `cities`
+* After each request you must remove the current SQLAlchemy Session:
+    * Declare a method to handle `@app.teardown_appcontext`
+    * Call in this method `storage.close()`
+* Routes:
+    * `/cities_by_states`: display a HTML page: (inside the tag `BODY`)
+        * `H1` tag: `States`
+        * `UL` tag: with the list of all `State` objects present in `DBStorage` sorted by name (A->Z)
+            * `LI` tag: description of one `State`: `<state.id>: <B><state.name></B>` + `UL` tag: with the list of `City` objects linked to the `State` sorted by `name` (A->Z)
+                * `LI` tag: description of one `City`: <city.id>: <B><city.name></B>`
+* Import this [`7-states_list.sql`](`./web_flask/tests/7-states_list.sql`) to have some data
+* You must use the option `strict_slashes=False` in your route definition
+
+**IMPORTANT**
+* Make sure you have a running and valid `setup_mysql_dev.sql` in your `AirBnB_clone_v2` repository ([task](./PROJECT_0x02.md/#white-check-mark-3-mysql-setup-development))
+* Make sure all tables are created when you run `echo "quit" | HBNB_MYSQL_USER=hbnb_dev HBNB_MYSQL_PWD=hbnb_dev_pwd HBNB_MYSQL_HOST=localhost HBNB_MYSQL_DB=hbnb_dev_db HBNB_TYPE_STORAGE=db ./console.py`
+
+File(s): [`web_flask/8-cities_by_states.py`](./web_flask/8-cities_by_states.py) [`web_flask/templates/8-cities_by_states.html`](./web_flask/templates/8-cities_by_states.html)
+
+### :white_check_mark: 10. States and State
+Write a script that starts a Flask web application:
+* Your web application must be listening on `0.0.0.0`, port `5000`
+* You must use `storage` for fetching data from the storage engine (`FileStorage` or `DBStorage`) => `from models import storage` and `storage.all(...)`
+* To load all cities of a `State`:
+    * If your storage engine is `DBStorage`, you must use `cities` relationship
+    * Otherwise, use the public getter method `cities`
+* After each request you must remove the current SQLAlchemy Session:
+    * Declare a method to handle `@app.teardown_appcontext`
+    * Call in this method `storage.close()`
+* Routes:
+    * `/states`: display a HTML page: (inside the tag `BODY`)
+        * `H1` tag: `States`
+        * `UL` tag: with the list of all `State` objects present in `DBStorage` sorted by name (A->Z)
+            * `LI` tag: description of one `State`: `<state.id>: <B><state.name></B>`
+    * `/states/<id>`: display a HTML page: (inside the tag `BODY`)
+        * If a `State` object is found with this `id`:
+            * `H1` tag: `State:`
+            * `H3` tag: `Cities:`
+            * `UL` tag: with the list of `City` objects linked to the `State` sorted by `name` (A->Z)
+                * `LI` tag: description of one `City`: `<city.id>: <B><city.name></B>`
+        * Otherwise:
+            * `H1` tag: `Not found!`
+* You must use the option `strict_slashes=False` in your route definition
+* Import this [`7-states_list.sql`](`./web_flask/tests/7-states_list.sql`) to have some data
+
+**IMPORTANT**
+* Make sure you have a running and valid `setup_mysql_dev.sql` in your `AirBnB_clone_v2` repository ([task](./PROJECT_0x02.md/#white-check-mark-3-mysql-setup-development))
+* Make sure all tables are created when you run `echo "quit" | HBNB_MYSQL_USER=hbnb_dev HBNB_MYSQL_PWD=hbnb_dev_pwd HBNB_MYSQL_HOST=localhost HBNB_MYSQL_DB=hbnb_dev_db HBNB_TYPE_STORAGE=db ./console.py`
+
+File(s): [`web_flask/9-states.py`](./web_flask/9-states.py) [`web_flask/templates/9-states.html`](./web_flask/templates/9-states.html)
+
+### :white_large_square: 11. HBNB filters
+Write a script that starts a Flask web application:
+* Your web application must be listening on `0.0.0.0`, port `5000`
+* You must use `storage` for fetching data from the storage engine (`FileStorage` or `DBStorage`) => `from models import storage` and `storage.all(...)`
+* To load all cities of a `State`:
+    * If your storage engine is `DBStorage`, you must use `cities` relationship
+    * Otherwise, use the public getter method `cities`
+* After each request you must remove the current SQLAlchemy Session:
+    * Declare a method to handle `@app.teardown_appcontext`
+    * Call in this method `storage.close()`
+* Routes:
+    * `/hbnb_filters`: display a HTML page like `6-index.html`, which was done during the project [0x01. AirBnB clone - Web static](https://github.com/allelomorph/AirBnB_clone/PROJECT_0x01.md)
+        * Copy files `3-footer.css`, `3-header.css`, `4-common.css` and `6-filters.css` from `web_static/styles/` to the folder `web_flask/static/styles`
+        * Copy files `icon.png` and `logo.png` from `web_static/images/` to the folder `web_flask/static/images`
+        * Update `.popover` class in `6-filters.css` to allow scrolling in the popover and a max height of 300 pixels.
+        * Use `6-index.html` content as source code for the template `10-hbnb_filters.html`:
+            * Replace the content of the `H4` tag under each filter title (`H3` States and `H3` Amenities) by `&nbsp;`
+        * `State`, `City` and `Amenity` objects must be loaded from `DBStorage` and sorted by name (A->Z)
+* You must use the option `strict_slashes=False` in your route definition
+* Import this [`10-hbnb_filters.sql`](./web_flask/tests/10-hbnb_filters.sql) to have some data
+
+**IMPORTANT**
+* Make sure you have a running and valid `setup_mysql_dev.sql` in your `AirBnB_clone_v2` repository ([task](./PROJECT_0x02.md/#white-check-mark-3-mysql-setup-development))
+* Make sure all tables are created when you run `echo "quit" | HBNB_MYSQL_USER=hbnb_dev HBNB_MYSQL_PWD=hbnb_dev_pwd HBNB_MYSQL_HOST=localhost HBNB_MYSQL_DB=hbnb_dev_db HBNB_TYPE_STORAGE=db ./console.py`
+
+File(s): [`web_flask/10-hbnb_filters.py`](./web_flask/10-hbnb_filters.py) [`web_flask/templates/10-hbnb_filters.html`](./web_flask/templates/10-hbnb_filters.html) [`web_flask/static/`](./web_flask/static/)
 
 ## Advanced Tasks
 
-### :white_check_mark: 4. Keep it clean!
-Write a Fabric script (based on the file `3-deploy_web_static.py`) that deletes out-of-date archives, using the function `do_clean`:
-* Prototype: `def do_clean(number=0):`
-* `number` is the number of the archives, including the most recent, to keep.
-    * If `number` is 0 or 1, keep only the most recent version of your archive.
-    * if `number` is 2, keep the most recent, and second most recent versions of your archive.
-    * etc.
-* Your script should:
-    * Delete all unnecessary archives (all archives minus the number to keep) in the `versions` folder
-    * Delete all unnecessary archives (all archives minus the number to keep) in the `/data/web_static/releases` folder of both of your web servers
-* All remote commands must be executed on both of your web servers (using the `env.hosts = ['<IP web-01>', 'IP web-02']` variable in your script)
+### :white_large_square: 12. HBNB is alive!
+Write a script that starts a Flask web application:
+* Your web application must be listening on `0.0.0.0`, port `5000`
+* You must use `storage` for fetching data from the storage engine (`FileStorage` or `DBStorage`) => `from models import storage` and `storage.all(...)`
+* To load all cities of a `State`:
+    * If your storage engine is `DBStorage`, you must use `cities` relationship
+    * Otherwise, use the public getter method `cities`
+* After each request you must remove the current SQLAlchemy Session:
+    * Declare a method to handle `@app.teardown_appcontext`
+    * Call in this method `storage.close()`
+* Routes:
+    * `/hbnb`: display a HTML page like `8-index.html`, done during the [0x01. AirBnB clone - Web static](https://github.com/allelomorph/AirBnB_clone/PROJECT_0x01.md) project
+        * Copy files `3-footer.css`, `3-header.css`, `4-common.css`, `6-filters.css` and `8-places.css` from `web_static/styles/` to the folder `web_flask/static/styles`
+        * Copy all files from `web_static/images/` to the folder `web_flask/static/images`
+        * Update `.popover` class in `6-filters.css` to enable scrolling in the popover and set max height to 300 pixels.
+        * Update `8-places.css` to always have the price by night on the top right of each place element, and the name correctly aligned and visible
+        * Use `8-index.html` content as source code for the template `100-hbnb.html`:
+            * Replace the content of the `H4` tag under each filter title (`H3` States and `H3` Amenities) by `&nbsp;`
+            * Make sure all HTML tags from objects are correctly used (example: `<BR />` must generate a new line)
+        * `State`, `City`, `Amenity` and `Place` objects must be loaded from DBStorage and sorted by name (A->Z)
+* You must use the option `strict_slashes=False` in your route definition
+* Import this [`100-hbnb.sql`](./web__flask/tests/100-hbnb.sql) to have some data
 
-File(s): [`100-clean_web_static.py`](./100-clean_web_static.py)
+**IMPORTANT**
+* Make sure you have a running and valid `setup_mysql_dev.sql` in your AirBnB_clone_v2 repository ([task](./PROJECT_0x02.md/#white-check-mark-3-mysql-setup-development))
+* Make sure all tables are created when you run `echo "quit" | HBNB_MYSQL_USER=hbnb_dev HBNB_MYSQL_PWD=hbnb_dev_pwd HBNB_MYSQL_HOST=localhost HBNB_MYSQL_DB=hbnb_dev_db HBNB_TYPE_STORAGE=db ./console.py`
 
-### :white_check_mark: 5. Puppet for setup
-Redo [task 0](#white_check_mark-0-prepare-your-web-servers), this time using Puppet.
-
-File(s): [`101-setup_web_static.pp`](./101-setup_web_static.pp)
+File(s): [`web_flask/100-hbnb.py`](./web_flask/100-hbnb.py) [`web_flask/templates/100-hbnb.html`](./web_flask/templates/100-hbnb.html) [`web_flask/static/`](./web_flask/static/)
 
 ---
 
 ## Student
-* **cedricDev97** - 
+* **cedricDev97** - (github.com/cedricDev97)
